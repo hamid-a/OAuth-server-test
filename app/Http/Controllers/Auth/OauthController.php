@@ -33,8 +33,9 @@ class OauthController extends Controller
     /**
      * Handle a login request to the application.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param  \Illuminate\Http\Request $request
      * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\Response|\Illuminate\Http\JsonResponse
+     * @throws \Illuminate\Validation\ValidationException
      */
     public function login(Request $request)
     {
@@ -50,6 +51,7 @@ class OauthController extends Controller
         }
 
         if (Auth::validate($request->only($this->username(), 'password'))) {
+            // if users authenticated redirect back to client site
             return $this->sendLoginResponse($request);
         }
 
@@ -87,20 +89,13 @@ class OauthController extends Controller
      */
     protected function sendLoginResponse(Request $request)
     {
+        // generate token and save for authorizing in next requests
         $token = str_random(64);
         DB::table('users')->where('email', $request->get('email'))->update([
             'api_token' => $token,
         ]);
 
-
+        // redirect to redirect_uri from client site
         return redirect($request->get('redirect_uri').'?token='.$token);
-//        $client = new Client;
-//        $client->request('GET', $request->get('redirect_uri'), [
-//            'allow_redirects' => true,
-//            'http_errors' => false,
-//            'form_params' => [
-//                'token' => $token,
-//            ],
-//        ]);
     }
 }

@@ -1,7 +1,6 @@
 <?php
 
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\DB;
 
 class UsersTableSeeder extends Seeder
 {
@@ -12,6 +11,8 @@ class UsersTableSeeder extends Seeder
      */
     public function run()
     {
+        DB::statement('DELETE FROM `users`;');
+        DB::statement('ALTER TABLE `users` AUTO_INCREMENT = 1;');
         DB::table('users')->insert([
             [
                 'name' => 'user1',
